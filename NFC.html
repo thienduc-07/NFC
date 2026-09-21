@@ -19,15 +19,16 @@
     
     <!-- Lenis for Smooth Scrolling -->
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
+    
     <!-- EmailJS SDK -->
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script type="text/javascript">
-   (function(){
-      emailjs.init({
-        publicKey: "qYEUyYSF6NEBHHEO8", // Thay bằng Public Key của bạn từ EmailJS
-      });
-   })();
-</script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+       (function(){
+          emailjs.init({
+            publicKey: "qYEUyYSF6NEBHHEO8", 
+          });
+       })();
+    </script>
 
     <script>
         tailwind.config = {
@@ -35,9 +36,9 @@
                 extend: {
                     colors: {
                         love: {
-                            text: '#5A4C4C',      // Nâu nhạt sang trọng
-                            accent: '#D4A3A3',    // Hồng đất
-                            rose: '#F2D3D3',      // Hồng phấn
+                            text: '#5A4C4C',      
+                            accent: '#D4A3A3',    
+                            rose: '#F2D3D3',      
                             bg: '#FDFBF7'
                         }
                     },
@@ -54,26 +55,25 @@
         /* 1. Tùy chỉnh thanh cuộn & Khóa cuộn lố (Overscroll) */
         body, html {
             overflow-x: hidden;
-            overscroll-behavior: none; /* Khóa cuộn lố 4 phía */
-            scrollbar-color: #D4A3A3 transparent; /* Cho Firefox */
+            overscroll-behavior: none; 
+            scrollbar-color: #D4A3A3 transparent; 
             scrollbar-width: thin;
         }
 
-        /* Thanh cuộn cho Chrome, Edge, Safari */
         ::-webkit-scrollbar {
             width: 10px;
         }
         ::-webkit-scrollbar-track {
-            background: rgba(253, 251, 247, 0.5); /* Nền nhạt */
+            background: rgba(253, 251, 247, 0.5); 
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb {
-            background-color: #D4A3A3; /* Màu hồng đất */
+            background-color: #D4A3A3; 
             border-radius: 10px;
             border: 2px solid rgba(253, 251, 247, 0.5);
         }
         ::-webkit-scrollbar-thumb:hover {
-            background-color: #5A4C4C; /* Nâu nhạt khi hover */
+            background-color: #5A4C4C; 
         }
 
         /* 2. Cấu trúc CSS cho thư viện Lenis Smooth Scroll */
@@ -99,15 +99,15 @@
             min-height: 100vh;
         }
 
-        /* Vinyl Player (Đĩa than) */
+        /* Vinyl Player (Đã phóng to lên 90px để nhìn rõ hơn) */
         .vinyl-wrapper {
             position: fixed;
             bottom: 24px;
             right: 24px;
             z-index: 50;
             cursor: pointer;
-            width: 70px;
-            height: 70px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -121,28 +121,46 @@
             height: 100%;
             border-radius: 50%;
             background: #1a1a1a;
-            /* Tạo rãnh đĩa than */
             background-image: repeating-radial-gradient(
                 #111, #111 2px, #1a1a1a 3px, #1a1a1a 4px
             );
             display: flex;
             align-items: center;
             justify-content: center;
+            animation: spin-clockwise 4s linear infinite;
+            animation-play-state: paused; 
         }
+        
+        .vinyl-disc.is-spinning {
+            animation-play-state: running;
+        }
+        
+        /* TÂM ĐĨA THAN (Phóng to tương ứng để hiển thị ảnh sắc nét) */
         .vinyl-label {
-            width: 26px;
-            height: 26px;
-            background: #D4A3A3;
+            width: 46px; 
+            height: 46px;
             border-radius: 50%;
+            background-image: url('assets/Images/IMG_7106.JPG'); 
+            background-size: cover;
+            background-position: center;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 0 3px rgba(255,255,255,0.3);
         }
+        
+        /* Lỗ nhỏ chính giữa đĩa than */
         .vinyl-hole {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             background: #FDFBF7;
             border-radius: 50%;
+            box-shadow: 0 0 2px rgba(0,0,0,0.8);
+        }
+
+        @keyframes spin-clockwise {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         /* Nốt nhạc bay ra khi phát */
@@ -150,14 +168,14 @@
             position: absolute;
             top: 0; right: 0;
             color: #D4A3A3;
-            font-size: 18px;
+            font-size: 20px;
             opacity: 0;
             pointer-events: none;
         }
         @keyframes float-music {
             0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
             50% { opacity: 1; }
-            100% { transform: translate(-20px, -40px) scale(1.2); opacity: 0; }
+            100% { transform: translate(-25px, -45px) scale(1.3); opacity: 0; }
         }
         .is-playing .music-note { animation: float-music 2s linear infinite; }
 
@@ -168,7 +186,7 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.06);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
-            break-inside: avoid; /* Ngăn ảnh bị cắt đôi trong cấu trúc columns */
+            break-inside: avoid; 
             margin-bottom: 24px;
         }
         .polaroid img {
@@ -211,8 +229,8 @@
 
 <body class="font-body text-love-text antialiased seamless-bg selection:bg-love-accent selection:text-white">
 
-    <!-- BẠN DÁN LINK NHẠC VÀO ĐÂY NHÉ (VD: src="music.mp3") -->
-    <audio id="bg-audio" src="" loop></audio>
+    <!-- AUDIO PHÁT NHẠC -->
+    <audio id="bg-audio" src="assets/Music/một đời (14 Casper, Bon Nghiêm, buitruonglinh) - L.mp3" loop></audio>
 
     <main class="w-full relative z-10 flex flex-col items-center">
         
@@ -220,8 +238,8 @@
         <section class="w-full min-h-screen flex flex-col items-center justify-start text-center px-4 relative pt-40 md:pt-48 pb-20">
             <p class="font-serif italic text-love-accent text-lg md:text-xl tracking-widest uppercase mb-4">The Love Album</p>
             
-           <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-4 drop-shadow-sm leading-tight text-love-text">
-            The Soundtrack <br> <span class="text-4xl md:text-6xl font-normal italic text-love-accent">of Us</span>
+            <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-4 drop-shadow-sm leading-tight text-love-text">
+                The Soundtrack <br> <span class="text-4xl md:text-6xl font-normal italic text-love-accent">of Us</span>
             </h1>
             
             <p class="text-love-text/70 tracking-[0.2em] uppercase text-sm md:text-base mb-16">Since 28.07.2026</p>
@@ -231,13 +249,13 @@
                 <p class="font-serif italic text-lg md:text-xl text-love-text/80 mb-6">Chuyến bay này đã khởi hành được...</p>
                 
                 <div class="flex flex-col items-center gap-4">
-                    <!-- Ngày (Rất lớn) -->
+                    <!-- Ngày -->
                     <div class="flex flex-col items-center">
                         <span id="days" class="text-7xl md:text-9xl font-serif text-love-accent font-bold leading-none">00</span>
                         <span class="text-sm md:text-base uppercase tracking-[0.3em] text-love-text/60 mt-2 font-medium">Ngày</span>
                     </div>
                     
-                    <!-- Giờ : Phút : Giây (Nhỏ tinh tế bên dưới) -->
+                    <!-- Giờ : Phút : Giây -->
                     <div class="flex items-center gap-3 mt-4 text-xl md:text-2xl font-serif text-love-text/80">
                         <div class="flex flex-col items-center w-12 md:w-16">
                             <span id="hours">00</span>
@@ -332,7 +350,6 @@
         <!-- 3. OUR MAP (BẢN ĐỒ KÝ ỨC) -->
         <section class="w-full py-20 px-6 mt-10">
             <div class="max-w-3xl mx-auto flex flex-col items-center text-center bg-white/40 backdrop-blur-sm border border-white/60 p-10 md:p-14 rounded-[2rem] shadow-sm map-section opacity-0">
-                <!-- Map Pin Icon -->
                 <svg class="w-12 h-12 text-love-accent mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -343,18 +360,14 @@
             </div>
         </section>
 
-        <!-- 4. POLAROID GALLERY (MASONRY GRID TỰ ĐỘNG) -->
+        <!-- 4. POLAROID GALLERY -->
         <section class="w-full py-24 px-6 relative">
             <div class="max-w-7xl mx-auto">
                 <div class="text-center mb-16">
                     <h2 class="font-serif text-3xl md:text-5xl text-love-text">Cuốn Phim Kỷ Niệm</h2>
                     <p class="text-love-text/60 mt-4 font-light italic">Những khoảnh khắc lấp lánh của tụi mình</p>
                 </div>
-
-                <!-- Vùng chứa ảnh: Chia cột tự động bằng Tailwind (columns-X) -->
-                <div id="masonry-gallery" class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 px-2">
-                    <!-- Ảnh sẽ được JavaScript tự động tạo và thả vào đây -->
-                </div>
+                <div id="masonry-gallery" class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 px-2"></div>
             </div>
         </section>
 
@@ -362,7 +375,7 @@
         <section class="w-full py-24 px-6 mt-10 border-t border-love-accent/20">
             <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-center">
                 
-                <!-- Cột trái: Lời Tựa (Liner Notes) -->
+                <!-- Cột trái -->
                 <div class="text-center md:text-left guest-anim opacity-0">
                     <h2 class="font-serif text-3xl md:text-5xl text-love-text mb-6">Liner Notes</h2>
                     <p class="text-love-text/80 leading-relaxed font-light mb-6">
@@ -370,11 +383,11 @@
                         Giống như một album nhạc, mỗi bức ảnh và mỗi cột mốc ở đây đều là một giai điệu làm nên "The Soundtrack of Us".
                     </p>
                     <p class="text-love-text/80 leading-relaxed font-light italic">
-                        Nếu bạn đang ở đây, hẳn bạn là một phần rất quan trọng trong cuộc hành trình của cả hai. Hãy để lại một lời nhắn nhỏ nhé!
+                        Если bạn đang ở đây, hẳn bạn là một phần rất quan trọng trong cuộc hành trình của cả hai. Hãy để lại một lời nhắn nhỏ nhé!
                     </p>
                 </div>
 
-                <!-- Cột phải: Sổ Lưu Bút (Guestbook Form) -->
+                <!-- Cột phải: Sổ Lưu Bút -->
                 <div class="bg-white p-8 md:p-10 rounded-2xl shadow-xl shadow-love-accent/5 guest-anim opacity-0">
                     <h3 class="font-serif text-2xl text-love-text mb-6">Sổ Lưu Bút</h3>
                     
@@ -392,7 +405,7 @@
                         </button>
                     </form>
 
-                    <!-- Tin nhắn cảm ơn sau khi gửi (ban đầu ẩn) -->
+                    <!-- Tin nhắn cảm ơn -->
                     <div id="thank-you-msg" class="hidden flex-col items-center text-center py-6">
                         <div class="w-12 h-12 bg-[#F2D3D3] text-love-text rounded-full flex items-center justify-center mb-4">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -413,10 +426,10 @@
 
     </main>
 
-    <!-- VINYL PLAYER (GÓC PHẢI) -->
-    <div id="vinyl-btn" class="vinyl-wrapper" title="Play our song">
+    <!-- VINYL PLAYER (Đã phóng to lên 90px) -->
+    <div id="vinyl-btn" class="vinyl-wrapper" title="Play/Pause music">
         <span class="music-note">🎵</span>
-        <div class="vinyl-disc">
+        <div id="vinyl-disc-el" class="vinyl-disc">
             <div class="vinyl-label">
                 <div class="vinyl-hole"></div>
             </div>
@@ -424,11 +437,18 @@
     </div>
 
     <script>
+        // 1. TỰ ĐỘNG CUỘN LÊN ĐẦU TRANG KHI RELOAD
+        window.addEventListener('beforeunload', () => {
+            window.scrollTo(0, 0);
+        });
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
         document.addEventListener('DOMContentLoaded', () => {
             
-            // ==========================================
-            // 0. KHỞI TẠO LENIS (SMOOTH SCROLLING)
-            // ==========================================
+            // 0. LENIS SMOOTH SCROLLING
             const lenis = new Lenis({
                 duration: 1.5,      
                 easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
@@ -452,9 +472,7 @@
             });
             gsap.ticker.lagSmoothing(0, 0);
 
-            // ==========================================
             // 1. LIVE COUNTER LOGIC
-            // ==========================================
             const startDate = new Date('2026-07-28T00:00:00').getTime();
 
             function updateCounter() {
@@ -474,9 +492,7 @@
             updateCounter();
             setInterval(updateCounter, 1000);
 
-            // ==========================================
-            // 2. TỰ ĐỘNG TẠO ẢNH POLAROID TỪ MẢNG (MASONRY)
-            // ==========================================
+            // 2. POLAROID GALLERY
             const photoList = [
                 { url: 'https://placehold.co/600x800/F2D3D3/5A4C4C?text=Anh+1', caption: 'Ngày nắng đẹp' },
                 { url: 'https://placehold.co/800x600/F2D3D3/5A4C4C?text=Anh+2', caption: 'Nụ cười ấy' },
@@ -489,9 +505,8 @@
             const galleryContainer = document.getElementById('masonry-gallery');
             let galleryHTML = '';
 
-            photoList.forEach((photo, index) => {
+            photoList.forEach((photo) => {
                 const randomRotate = (Math.random() * 8 - 4).toFixed(1);
-                
                 galleryHTML += `
                     <div class="polaroid opacity-0" style="transform: rotate(${randomRotate}deg);">
                         <img src="${photo.url}" alt="${photo.caption}" loading="lazy">
@@ -500,10 +515,8 @@
                 `;
             });
             galleryContainer.innerHTML = galleryHTML;
-            // ==========================================
-            // 3. EmailJS
-            // ==========================================
 
+            // 3. XỬ LÝ FORM GUESTBOOK (EMAILJS)
             const form = document.getElementById('guestbook-form');
             const submitBtn = document.getElementById('submit-guestbook');
             const thankYouMsg = document.getElementById('thank-you-msg');
@@ -516,7 +529,6 @@
                     submitBtn.style.opacity = '0.7';
                     submitBtn.disabled = true;
 
-                    // Thay YOUR_SERVICE_ID và YOUR_TEMPLATE_ID bằng thông tin từ tài khoản EmailJS của bạn
                     emailjs.sendForm('service_axlt0ls', 'template_tkisnis', form)
                         .then(() => {
                             form.classList.add('hidden');
@@ -532,54 +544,55 @@
                 });
             }
 
-            // ==========================================
             // 4. VINYL AUDIO LOGIC
-            // ==========================================
             const vinylBtn = document.getElementById('vinyl-btn');
+            const vinylDiscEl = document.getElementById('vinyl-disc-el');
             const audio = document.getElementById('bg-audio');
             let isPlaying = false;
 
-            vinylBtn.addEventListener('click', () => {
-                if (!audio.getAttribute('src') || audio.getAttribute('src') === '') {
-                    const msg = document.createElement('div');
-                    msg.textContent = "Nhớ thêm link nhạc vào HTML nha!";
-                    msg.className = "fixed bottom-[110px] right-6 bg-love-accent text-white px-4 py-2 rounded-xl text-sm font-sans shadow-lg opacity-0 transition-opacity duration-300 z-50 pointer-events-none";
-                    document.body.appendChild(msg);
-                    
-                    setTimeout(() => msg.style.opacity = '1', 10);
-                    setTimeout(() => {
-                        msg.style.opacity = '0';
-                        setTimeout(() => msg.remove(), 300);
-                    }, 2500);
-                    
-                    vinylBtn.querySelector('.vinyl-disc').classList.toggle('animate-[spin_4s_linear_infinite]');
-                    vinylBtn.classList.toggle('is-playing');
-                    return;
-                }
+            function startMusic() {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    vinylDiscEl.classList.add('is-spinning');
+                    vinylBtn.classList.add('is-playing');
+                }).catch(err => {
+                    console.log("Trình duyệt chặn tự động phát:", err);
+                });
+            }
 
-                if (isPlaying) {
-                    audio.pause();
-                    vinylBtn.querySelector('.vinyl-disc').classList.remove('animate-[spin_4s_linear_infinite]');
-                    vinylBtn.classList.remove('is-playing');
-                } else {
-                    audio.play().then(() => {
-                        vinylBtn.querySelector('.vinyl-disc').classList.add('animate-[spin_4s_linear_infinite]');
-                        vinylBtn.classList.add('is-playing');
-                    }).catch(err => console.log("Lỗi tự động phát nhạc:", err));
-                }
-                isPlaying = !isPlaying;
+            function pauseMusic() {
+                audio.pause();
+                isPlaying = false;
+                vinylDiscEl.classList.remove('is-spinning');
+                vinylBtn.classList.remove('is-playing');
+            }
+
+            window.addEventListener('load', () => {
+                startMusic();
             });
 
-            // ==========================================
+            document.body.addEventListener('click', function initAudioOnce() {
+                if (!isPlaying) {
+                    startMusic();
+                }
+                document.body.removeEventListener('click', initAudioOnce);
+            }, { once: true });
+
+            vinylBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (isPlaying) {
+                    pauseMusic();
+                } else {
+                    startMusic();
+                }
+            });
+
             // 5. GSAP SCROLL ANIMATIONS
-            // ==========================================
             gsap.registerPlugin(ScrollTrigger);
 
-            // Animate Hero text
             gsap.from("h1", { opacity: 0, y: 30, duration: 1.5, ease: "power3.out" });
             gsap.from(".bg-white\\/40", { opacity: 0, y: 20, scale: 0.95, duration: 1.2, delay: 0.4, ease: "power2.out" });
 
-            // Animate Timeline Tracks
             gsap.utils.toArray('.track-item').forEach((track) => {
                 gsap.fromTo(track, 
                     { opacity: 0, y: 40 },
@@ -594,7 +607,6 @@
                 );
             });
 
-            // Animate Map Section
             gsap.to(".map-section", {
                 opacity: 1, y: -20, duration: 1, ease: "power2.out",
                 scrollTrigger: {
@@ -603,7 +615,6 @@
                 }
             });
 
-            // Animate Polaroids (Stagger effect - Hiện lần lượt)
             ScrollTrigger.batch(".polaroid", {
                 onEnter: batch => gsap.to(batch, {
                     opacity: 1, 
@@ -615,7 +626,6 @@
                 start: "top 85%",
             });
 
-            // Animate Liner Notes & Guestbook
             gsap.utils.toArray('.guest-anim').forEach((el, index) => {
                 gsap.fromTo(el,
                     { opacity: 0, y: 30 },
