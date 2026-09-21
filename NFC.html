@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Soundtrack of Us</title>
+    
+    <!-- Fonts: Playfair Display (Tiêu đề), Lora (Nội dung) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Lenis for Smooth Scrolling -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
+    <!-- EmailJS SDK -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script type="text/javascript">
+   (function(){
+      emailjs.init({
+        publicKey: "qYEUyYSF6NEBHHEO8", // Thay bằng Public Key của bạn từ EmailJS
+      });
+   })();
+</script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        love: {
+                            text: '#5A4C4C',      // Nâu nhạt sang trọng
+                            accent: '#D4A3A3',    // Hồng đất
+                            rose: '#F2D3D3',      // Hồng phấn
+                            bg: '#FDFBF7'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        body: ['Lora', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* 1. Tùy chỉnh thanh cuộn & Khóa cuộn lố (Overscroll) */
+        body, html {
+            overflow-x: hidden;
+            overscroll-behavior: none; /* Khóa cuộn lố 4 phía */
+            scrollbar-color: #D4A3A3 transparent; /* Cho Firefox */
+            scrollbar-width: thin;
+        }
+
+        /* Thanh cuộn cho Chrome, Edge, Safari */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(253, 251, 247, 0.5); /* Nền nhạt */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #D4A3A3; /* Màu hồng đất */
+            border-radius: 10px;
+            border: 2px solid rgba(253, 251, 247, 0.5);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #5A4C4C; /* Nâu nhạt khi hover */
+        }
+
+        /* 2. Cấu trúc CSS cho thư viện Lenis Smooth Scroll */
+        html.lenis {
+            height: auto;
+        }
+        .lenis.lenis-smooth {
+            scroll-behavior: auto;
+        }
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+        .lenis.lenis-scrolling iframe {
+            pointer-events: none;
+        }
+
+        /* Nền Gradient mượt mà xuyên suốt */
+        .seamless-bg {
+            background: linear-gradient(135deg, #FFF5F5 0%, #FDFBF7 100%);
+            min-height: 100vh;
+        }
+
+        /* Vinyl Player (Đĩa than) */
+        .vinyl-wrapper {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 50;
+            cursor: pointer;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .vinyl-wrapper:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        .vinyl-disc {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #1a1a1a;
+            /* Tạo rãnh đĩa than */
+            background-image: repeating-radial-gradient(
+                #111, #111 2px, #1a1a1a 3px, #1a1a1a 4px
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .vinyl-label {
+            width: 26px;
+            height: 26px;
+            background: #D4A3A3;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .vinyl-hole {
+            width: 6px;
+            height: 6px;
+            background: #FDFBF7;
+            border-radius: 50%;
+        }
+
+        /* Nốt nhạc bay ra khi phát */
+        .music-note {
+            position: absolute;
+            top: 0; right: 0;
+            color: #D4A3A3;
+            font-size: 18px;
+            opacity: 0;
+            pointer-events: none;
+        }
+        @keyframes float-music {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translate(-20px, -40px) scale(1.2); opacity: 0; }
+        }
+        .is-playing .music-note { animation: float-music 2s linear infinite; }
+
+        /* Polaroid Images */
+        .polaroid {
+            background: #ffffff;
+            padding: 12px 12px 40px 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            break-inside: avoid; /* Ngăn ảnh bị cắt đôi trong cấu trúc columns */
+            margin-bottom: 24px;
+        }
+        .polaroid img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            filter: sepia(0.05) contrast(1.02);
+        }
+        .polaroid:hover {
+            transform: scale(1.05) rotate(0deg) !important;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            z-index: 10;
+        }
+        .polaroid-caption {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            text-align: center;
+            margin-top: 12px;
+            color: #5A4C4C;
+            font-size: 0.95rem;
+        }
+
+        /* Dòng kẻ Timeline */
+        .timeline-line {
+            position: absolute;
+            left: 24px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, #D4A3A3, transparent);
+        }
+        @media (min-width: 768px) {
+            .timeline-line {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+
+<body class="font-body text-love-text antialiased seamless-bg selection:bg-love-accent selection:text-white">
+
+    <!-- BẠN DÁN LINK NHẠC VÀO ĐÂY NHÉ (VD: src="music.mp3") -->
+    <audio id="bg-audio" src="" loop></audio>
+
+    <main class="w-full relative z-10 flex flex-col items-center">
+        
+        <!-- 1. HERO SECTION -->
+        <section class="w-full min-h-screen flex flex-col items-center justify-start text-center px-4 relative pt-40 md:pt-48 pb-20">
+            <p class="font-serif italic text-love-accent text-lg md:text-xl tracking-widest uppercase mb-4">The Love Album</p>
+            
+           <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-4 drop-shadow-sm leading-tight text-love-text">
+            The Soundtrack <br> <span class="text-4xl md:text-6xl font-normal italic text-love-accent">of Us</span>
+            </h1>
+            
+            <p class="text-love-text/70 tracking-[0.2em] uppercase text-sm md:text-base mb-16">Since 28.07.2026</p>
+
+            <!-- Counter Box -->
+            <div class="bg-white/40 backdrop-blur-md border border-white/60 p-8 md:p-12 rounded-[2rem] shadow-xl w-full max-w-2xl mx-auto">
+                <p class="font-serif italic text-lg md:text-xl text-love-text/80 mb-6">Chuyến bay này đã khởi hành được...</p>
+                
+                <div class="flex flex-col items-center gap-4">
+                    <!-- Ngày (Rất lớn) -->
+                    <div class="flex flex-col items-center">
+                        <span id="days" class="text-7xl md:text-9xl font-serif text-love-accent font-bold leading-none">00</span>
+                        <span class="text-sm md:text-base uppercase tracking-[0.3em] text-love-text/60 mt-2 font-medium">Ngày</span>
+                    </div>
+                    
+                    <!-- Giờ : Phút : Giây (Nhỏ tinh tế bên dưới) -->
+                    <div class="flex items-center gap-3 mt-4 text-xl md:text-2xl font-serif text-love-text/80">
+                        <div class="flex flex-col items-center w-12 md:w-16">
+                            <span id="hours">00</span>
+                            <span class="text-[0.6rem] md:text-xs uppercase tracking-widest text-love-text/50 font-sans">Giờ</span>
+                        </div>
+                        <span class="mb-4">:</span>
+                        <div class="flex flex-col items-center w-12 md:w-16">
+                            <span id="minutes">00</span>
+                            <span class="text-[0.6rem] md:text-xs uppercase tracking-widest text-love-text/50 font-sans">Phút</span>
+                        </div>
+                        <span class="mb-4">:</span>
+                        <div class="flex flex-col items-center w-12 md:w-16">
+                            <span id="seconds">00</span>
+                            <span class="text-[0.6rem] md:text-xs uppercase tracking-widest text-love-text/50 font-sans">Giây</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mũi tên cuộn -->
+            <div class="absolute bottom-8 animate-bounce opacity-50">
+                <svg class="w-6 h-6 text-love-text" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </div>
+        </section>
+
+        <!-- 2. TIMELINE KỶ NIỆM -->
+        <section class="w-full py-24 px-6 relative max-w-5xl mx-auto">
+            <div class="text-center mb-24">
+                <h2 class="font-serif text-3xl md:text-5xl text-love-text">Timeline Kỷ Niệm</h2>
+                <div class="w-12 h-px bg-love-accent mx-auto mt-6"></div>
+            </div>
+
+            <div class="relative">
+                <div class="timeline-line"></div>
+
+                <!-- Mốc 1 -->
+                <div class="track-item flex flex-col md:flex-row items-center justify-between mb-20 md:mb-32 relative opacity-0">
+                    <div class="hidden md:block w-5/12 text-right pr-12">
+                        <img src="https://placehold.co/500x350/F2D3D3/5A4C4C?text=Ngay+Dau" alt="Memory 1" class="rounded-xl shadow-lg w-full object-cover">
+                    </div>
+                    
+                    <div class="absolute left-[4px] md:left-1/2 md:-ml-[25px] w-[42px] h-[42px] md:w-[50px] md:h-[50px] rounded-full bg-[#FDFBF7] border-[3px] md:border-4 border-love-accent flex items-center justify-center z-10 shadow-md">
+                        <span class="font-serif font-bold text-love-text text-sm md:text-base">01</span>
+                    </div>
+
+                    <div class="w-full pl-16 md:pl-0 md:w-5/12 md:text-left md:pl-12">
+                        <p class="text-xs md:text-sm text-love-accent font-bold tracking-[0.2em] mb-2 uppercase">28/07/2026</p>
+                        <h3 class="font-serif text-2xl md:text-3xl text-love-text mb-4">Ngày chính thức quen nhau</h3>
+                        <p class="text-love-text/80 leading-relaxed font-light">Một ngày bình thường bỗng trở nên đặc biệt. Nơi góc phố ấy, nụ cười của em/anh đã chính thức bấm nút Play cho bản nhạc của chúng ta.</p>
+                        <img src="https://placehold.co/500x350/F2D3D3/5A4C4C?text=Ngay+Dau" alt="Memory 1" class="md:hidden mt-6 rounded-xl shadow-lg w-full object-cover">
+                    </div>
+                </div>
+
+                <!-- Mốc 2 -->
+                <div class="track-item flex flex-col md:flex-row-reverse items-center justify-between mb-20 md:mb-32 relative opacity-0">
+                    <div class="hidden md:block w-5/12 text-left pl-12">
+                        <img src="https://placehold.co/500x350/F2D3D3/5A4C4C?text=Chuyen+Di" alt="Memory 2" class="rounded-xl shadow-lg w-full object-cover">
+                    </div>
+                    
+                    <div class="absolute left-[4px] md:left-1/2 md:-ml-[25px] w-[42px] h-[42px] md:w-[50px] md:h-[50px] rounded-full bg-[#FDFBF7] border-[3px] md:border-4 border-love-accent flex items-center justify-center z-10 shadow-md">
+                        <span class="font-serif font-bold text-love-text text-sm md:text-base">02</span>
+                    </div>
+
+                    <div class="w-full pl-16 md:pl-0 md:w-5/12 md:text-right md:pr-12">
+                        <p class="text-xs md:text-sm text-love-accent font-bold tracking-[0.2em] mb-2 uppercase">[Ngày Chuyến Đi/Kỷ Niệm]</p>
+                        <h3 class="font-serif text-2xl md:text-3xl text-love-text mb-4">Chuyến đi đầu tiên</h3>
+                        <p class="text-love-text/80 leading-relaxed font-light">Những cái chạm tay ngại ngùng, những tin nhắn thao thức hàng đêm. Tình cảm cứ thế lớn dần lên qua từng giai điệu.</p>
+                        <img src="https://placehold.co/500x350/F2D3D3/5A4C4C?text=Chuyen+Di" alt="Memory 2" class="md:hidden mt-6 rounded-xl shadow-lg w-full object-cover">
+                    </div>
+                </div>
+
+                <!-- Mốc 3 -->
+                <div class="track-item flex flex-col md:flex-row items-center justify-between mb-10 relative opacity-0">
+                    <div class="hidden md:block w-5/12 text-right pr-12">
+                        <img src="https://placehold.co/500x350/F2D3D3/5A4C4C?text=Hien+Tai" alt="Memory 3" class="rounded-xl shadow-lg w-full object-cover">
+                    </div>
+                    
+                    <div class="absolute left-[4px] md:left-1/2 md:-ml-[25px] w-[42px] h-[42px] md:w-[50px] md:h-[50px] rounded-full bg-[#FDFBF7] border-[3px] md:border-4 border-love-accent flex items-center justify-center z-10 shadow-md">
+                        <span class="font-serif font-bold text-love-text text-sm md:text-base">03</span>
+                    </div>
+
+                    <div class="w-full pl-16 md:pl-0 md:w-5/12 md:text-left md:pl-12">
+                        <p class="text-xs md:text-sm text-love-accent font-bold tracking-[0.2em] mb-2 uppercase">Hiện Tại</p>
+                        <h3 class="font-serif text-2xl md:text-3xl text-love-text mb-4">Và còn hơn thế nữa...</h3>
+                        <p class="text-love-text/80 leading-relaxed font-light">Vượt qua những bộn bề, chúng ta nắm tay nhau đi đến những chân trời mới. Điệp khúc đẹp nhất là khi có nhau.</p>
+                        <img src="https://placehold.co/500x350/F2D3D3/5A4C4C?text=Hien+Tai" alt="Memory 3" class="md:hidden mt-6 rounded-xl shadow-lg w-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. OUR MAP (BẢN ĐỒ KÝ ỨC) -->
+        <section class="w-full py-20 px-6 mt-10">
+            <div class="max-w-3xl mx-auto flex flex-col items-center text-center bg-white/40 backdrop-blur-sm border border-white/60 p-10 md:p-14 rounded-[2rem] shadow-sm map-section opacity-0">
+                <!-- Map Pin Icon -->
+                <svg class="w-12 h-12 text-love-accent mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <h2 class="font-serif text-3xl text-love-text mb-4">Nơi Mọi Thứ Bắt Đầu</h2>
+                <p class="text-love-text/80 text-lg italic">Tọa độ yêu thương: <span class="font-medium not-italic text-love-accent">[Điền tên quán Cafe / Góc phố của bạn]</span></p>
+                <p class="text-sm text-love-text/60 mt-4 font-light">"Chỉ một khoảnh khắc vô tình, mà thương nhớ cả một đời."</p>
+            </div>
+        </section>
+
+        <!-- 4. POLAROID GALLERY (MASONRY GRID TỰ ĐỘNG) -->
+        <section class="w-full py-24 px-6 relative">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="font-serif text-3xl md:text-5xl text-love-text">Cuốn Phim Kỷ Niệm</h2>
+                    <p class="text-love-text/60 mt-4 font-light italic">Những khoảnh khắc lấp lánh của tụi mình</p>
+                </div>
+
+                <!-- Vùng chứa ảnh: Chia cột tự động bằng Tailwind (columns-X) -->
+                <div id="masonry-gallery" class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 px-2">
+                    <!-- Ảnh sẽ được JavaScript tự động tạo và thả vào đây -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. LINER NOTES & GUESTBOOK -->
+        <section class="w-full py-24 px-6 mt-10 border-t border-love-accent/20">
+            <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-center">
+                
+                <!-- Cột trái: Lời Tựa (Liner Notes) -->
+                <div class="text-center md:text-left guest-anim opacity-0">
+                    <h2 class="font-serif text-3xl md:text-5xl text-love-text mb-6">Liner Notes</h2>
+                    <p class="text-love-text/80 leading-relaxed font-light mb-6">
+                        Cảm ơn bạn đã quét chiếc đĩa than nhỏ này và ghé thăm bảo tàng kỷ niệm của chúng mình.
+                        Giống như một album nhạc, mỗi bức ảnh và mỗi cột mốc ở đây đều là một giai điệu làm nên "The Soundtrack of Us".
+                    </p>
+                    <p class="text-love-text/80 leading-relaxed font-light italic">
+                        Nếu bạn đang ở đây, hẳn bạn là một phần rất quan trọng trong cuộc hành trình của cả hai. Hãy để lại một lời nhắn nhỏ nhé!
+                    </p>
+                </div>
+
+                <!-- Cột phải: Sổ Lưu Bút (Guestbook Form) -->
+                <div class="bg-white p-8 md:p-10 rounded-2xl shadow-xl shadow-love-accent/5 guest-anim opacity-0">
+                    <h3 class="font-serif text-2xl text-love-text mb-6">Sổ Lưu Bút</h3>
+                    
+                    <form id="guestbook-form" class="flex flex-col gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-love-text/70 mb-2">Tên của bạn</label>
+                            <input type="text" name="from_name" required placeholder="VD: Tí, Tèo..." class="w-full px-4 py-3 rounded-lg border border-love-text/20 focus:outline-none focus:border-love-accent focus:ring-1 focus:ring-love-accent bg-love-bg/50 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-love-text/70 mb-2">Lời nhắn gửi</label>
+                            <textarea name="message" required rows="3" placeholder="Chúc hai bạn..." class="w-full px-4 py-3 rounded-lg border border-love-text/20 focus:outline-none focus:border-love-accent focus:ring-1 focus:ring-love-accent bg-love-bg/50 transition-all resize-none"></textarea>
+                        </div>
+                        <button type="submit" id="submit-guestbook" class="w-full mt-2 font-serif text-white bg-love-accent hover:bg-love-text px-8 py-3 rounded-lg transition-all duration-300 shadow-md">
+                            Gửi Lời Nhắn
+                        </button>
+                    </form>
+
+                    <!-- Tin nhắn cảm ơn sau khi gửi (ban đầu ẩn) -->
+                    <div id="thank-you-msg" class="hidden flex-col items-center text-center py-6">
+                        <div class="w-12 h-12 bg-[#F2D3D3] text-love-text rounded-full flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <h4 class="font-serif text-xl text-love-text mb-2">Đã nhận được lời chúc!</h4>
+                        <p class="text-sm text-love-text/70">Cảm ơn bạn rất nhiều vì đã lưu lại kỷ niệm cùng chúng mình.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="w-full py-16 text-center mt-10">
+            <div class="w-10 h-px bg-love-accent/50 mx-auto mb-6"></div>
+            <p class="font-serif italic text-love-text/70">The Soundtrack of Us - Bất tận như cách anh yêu em.</p>
+        </footer>
+
+    </main>
+
+    <!-- VINYL PLAYER (GÓC PHẢI) -->
+    <div id="vinyl-btn" class="vinyl-wrapper" title="Play our song">
+        <span class="music-note">🎵</span>
+        <div class="vinyl-disc">
+            <div class="vinyl-label">
+                <div class="vinyl-hole"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // ==========================================
+            // 0. KHỞI TẠO LENIS (SMOOTH SCROLLING)
+            // ==========================================
+            const lenis = new Lenis({
+                duration: 1.5,      
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+                direction: 'vertical',
+                gestureDirection: 'vertical',
+                smooth: true,
+                mouseMultiplier: 0.8, 
+                smoothTouch: false,
+                touchMultiplier: 2,
+            });
+
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
+            requestAnimationFrame(raf);
+
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add((time) => {
+                lenis.raf(time * 1000);
+            });
+            gsap.ticker.lagSmoothing(0, 0);
+
+            // ==========================================
+            // 1. LIVE COUNTER LOGIC
+            // ==========================================
+            const startDate = new Date('2026-07-28T00:00:00').getTime();
+
+            function updateCounter() {
+                const now = new Date().getTime();
+                const difference = Math.abs(now - startDate); 
+
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+                document.getElementById('days').innerText = days.toString().padStart(2, '0');
+                document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').innerText = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').innerText = seconds.toString().padStart(2, '0');
+            }
+            updateCounter();
+            setInterval(updateCounter, 1000);
+
+            // ==========================================
+            // 2. TỰ ĐỘNG TẠO ẢNH POLAROID TỪ MẢNG (MASONRY)
+            // ==========================================
+            const photoList = [
+                { url: 'https://placehold.co/600x800/F2D3D3/5A4C4C?text=Anh+1', caption: 'Ngày nắng đẹp' },
+                { url: 'https://placehold.co/800x600/F2D3D3/5A4C4C?text=Anh+2', caption: 'Nụ cười ấy' },
+                { url: 'https://placehold.co/500x700/F2D3D3/5A4C4C?text=Anh+3', caption: 'Chuyến đi Đà Lạt' },
+                { url: 'https://placehold.co/600x600/F2D3D3/5A4C4C?text=Anh+4', caption: 'Nắm tay' },
+                { url: 'https://placehold.co/700x900/F2D3D3/5A4C4C?text=Anh+5', caption: 'Kỷ niệm sinh nhật' },
+                { url: 'https://placehold.co/800x800/F2D3D3/5A4C4C?text=Anh+6', caption: 'Mùa đông đầu tiên' },
+            ];
+
+            const galleryContainer = document.getElementById('masonry-gallery');
+            let galleryHTML = '';
+
+            photoList.forEach((photo, index) => {
+                const randomRotate = (Math.random() * 8 - 4).toFixed(1);
+                
+                galleryHTML += `
+                    <div class="polaroid opacity-0" style="transform: rotate(${randomRotate}deg);">
+                        <img src="${photo.url}" alt="${photo.caption}" loading="lazy">
+                        <p class="polaroid-caption">${photo.caption}</p>
+                    </div>
+                `;
+            });
+            galleryContainer.innerHTML = galleryHTML;
+            // ==========================================
+            // 3. EmailJS
+            // ==========================================
+
+            const form = document.getElementById('guestbook-form');
+            const submitBtn = document.getElementById('submit-guestbook');
+            const thankYouMsg = document.getElementById('thank-you-msg');
+
+            if(form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault(); 
+                    
+                    submitBtn.innerHTML = 'Đang gửi...';
+                    submitBtn.style.opacity = '0.7';
+                    submitBtn.disabled = true;
+
+                    // Thay YOUR_SERVICE_ID và YOUR_TEMPLATE_ID bằng thông tin từ tài khoản EmailJS của bạn
+                    emailjs.sendForm('service_axlt0ls', 'template_tkisnis', form)
+                        .then(() => {
+                            form.classList.add('hidden');
+                            thankYouMsg.classList.remove('hidden');
+                            thankYouMsg.classList.add('flex');
+                        }, (error) => {
+                            submitBtn.innerHTML = 'Gửi lại';
+                            submitBtn.style.opacity = '1';
+                            submitBtn.disabled = false;
+                            alert("Có lỗi xảy ra, bạn thử lại sau nhé!");
+                            console.log('FAILED...', error.text);
+                        });
+                });
+            }
+
+            // ==========================================
+            // 4. VINYL AUDIO LOGIC
+            // ==========================================
+            const vinylBtn = document.getElementById('vinyl-btn');
+            const audio = document.getElementById('bg-audio');
+            let isPlaying = false;
+
+            vinylBtn.addEventListener('click', () => {
+                if (!audio.getAttribute('src') || audio.getAttribute('src') === '') {
+                    const msg = document.createElement('div');
+                    msg.textContent = "Nhớ thêm link nhạc vào HTML nha!";
+                    msg.className = "fixed bottom-[110px] right-6 bg-love-accent text-white px-4 py-2 rounded-xl text-sm font-sans shadow-lg opacity-0 transition-opacity duration-300 z-50 pointer-events-none";
+                    document.body.appendChild(msg);
+                    
+                    setTimeout(() => msg.style.opacity = '1', 10);
+                    setTimeout(() => {
+                        msg.style.opacity = '0';
+                        setTimeout(() => msg.remove(), 300);
+                    }, 2500);
+                    
+                    vinylBtn.querySelector('.vinyl-disc').classList.toggle('animate-[spin_4s_linear_infinite]');
+                    vinylBtn.classList.toggle('is-playing');
+                    return;
+                }
+
+                if (isPlaying) {
+                    audio.pause();
+                    vinylBtn.querySelector('.vinyl-disc').classList.remove('animate-[spin_4s_linear_infinite]');
+                    vinylBtn.classList.remove('is-playing');
+                } else {
+                    audio.play().then(() => {
+                        vinylBtn.querySelector('.vinyl-disc').classList.add('animate-[spin_4s_linear_infinite]');
+                        vinylBtn.classList.add('is-playing');
+                    }).catch(err => console.log("Lỗi tự động phát nhạc:", err));
+                }
+                isPlaying = !isPlaying;
+            });
+
+            // ==========================================
+            // 5. GSAP SCROLL ANIMATIONS
+            // ==========================================
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Animate Hero text
+            gsap.from("h1", { opacity: 0, y: 30, duration: 1.5, ease: "power3.out" });
+            gsap.from(".bg-white\\/40", { opacity: 0, y: 20, scale: 0.95, duration: 1.2, delay: 0.4, ease: "power2.out" });
+
+            // Animate Timeline Tracks
+            gsap.utils.toArray('.track-item').forEach((track) => {
+                gsap.fromTo(track, 
+                    { opacity: 0, y: 40 },
+                    {
+                        opacity: 1, y: 0,
+                        duration: 1, ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: track,
+                            start: "top 80%",
+                        }
+                    }
+                );
+            });
+
+            // Animate Map Section
+            gsap.to(".map-section", {
+                opacity: 1, y: -20, duration: 1, ease: "power2.out",
+                scrollTrigger: {
+                    trigger: ".map-section",
+                    start: "top 85%",
+                }
+            });
+
+            // Animate Polaroids (Stagger effect - Hiện lần lượt)
+            ScrollTrigger.batch(".polaroid", {
+                onEnter: batch => gsap.to(batch, {
+                    opacity: 1, 
+                    y: 0, 
+                    duration: 0.8, 
+                    stagger: 0.15, 
+                    ease: "back.out(1.2)"
+                }),
+                start: "top 85%",
+            });
+
+            // Animate Liner Notes & Guestbook
+            gsap.utils.toArray('.guest-anim').forEach((el, index) => {
+                gsap.fromTo(el,
+                    { opacity: 0, y: 30 },
+                    {
+                        opacity: 1, y: 0,
+                        duration: 1,
+                        delay: index * 0.2,
+                        ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: el,
+                            start: "top 85%",
+                        }
+                    }
+                );
+            });
+        });
+    </script>
+</body>
+</html>
