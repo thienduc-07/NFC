@@ -254,6 +254,14 @@
         .noise-overlay {
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
+        /* Khóa tính năng bấm giữ để lưu ảnh trên điện thoại & chuột phải trên PC */
+        .lock-img {
+            -webkit-touch-callout: none !important; 
+            -webkit-user-drag: none !important; 
+            user-drag: none !important;
+            user-select: none !important;
+            pointer-events: none !important; 
+        }
     </style>
 </head>
 
@@ -608,6 +616,61 @@
             </div>
         </div>
     </div>
+    <!-- 5. MODAL BÁO LỖI SAI PASS (Tone hồng) -->
+    <div id="error-modal" class="fixed inset-0 bg-love-text/60 backdrop-blur-sm z-[150] hidden flex items-center justify-center opacity-0 transition-opacity duration-300 px-4">
+        <div class="bg-[#FFF5F5] p-8 rounded-[2rem] shadow-2xl border border-love-accent/30 w-full max-w-sm text-center transform scale-95 transition-transform duration-300" id="error-box">
+            <div class="w-16 h-16 bg-[#F2D3D3] rounded-full flex items-center justify-center mx-auto mb-4 text-love-text">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <h3 class="font-serif text-2xl text-love-text mb-2">Sai Mật Mã</h3>
+            <p class="text-sm text-love-text/60 mb-6">Mật mã tình yêu không đúng rồi, bạn thử lại nhé!</p>
+            <button id="close-error" class="w-full bg-love-accent text-white py-3 rounded-xl font-bold hover:bg-love-text transition-colors shadow-md">Thử Lại</button>
+        </div>
+    </div>
+
+    <!-- 6. MODAL CHỈNH SỬA NỘI DUNG (Sau khi nhập đúng pass) -->
+    <div id="edit-modal" class="fixed inset-0 bg-love-text/80 backdrop-blur-md z-[100] hidden flex items-center justify-center opacity-0 transition-opacity duration-300 p-4">
+        <div class="bg-[#FDFBF7] p-6 md:p-8 rounded-[2rem] shadow-2xl border border-love-accent/30 w-full max-w-4xl flex flex-col md:flex-row gap-8 transform scale-95 transition-transform duration-300 overflow-y-auto max-h-[95vh]" id="edit-box">
+            <!-- Cột trái: Ảnh minh họa (Không cho đổi ảnh, chỉ đổi chữ) -->
+            <div class="w-full md:w-1/2 flex flex-col items-center justify-center">
+                <div class="w-full aspect-[4/5] bg-white border-2 border-love-accent/30 rounded-2xl flex flex-col items-center justify-center overflow-hidden relative shadow-sm">
+                    <img id="edit-image-preview" class="w-full h-full object-cover lock-img" oncontextmenu="return false;"/>
+                </div>
+            </div>
+
+            <!-- Cột phải: Form sửa chữ -->
+            <div class="w-full md:w-1/2 flex flex-col gap-4">
+                <div>
+                    <h3 class="font-serif text-3xl text-love-text mb-1">Chỉnh Sửa Kỷ Niệm</h3>
+                    <p class="text-sm text-love-text/60 italic">Cập nhật lại thông tin cho chính xác nhé</p>
+                </div>
+                
+                <!-- Ẩn category đi vì không cho phép đổi qua lại giữa ảnh thường và ảnh đồ ăn -->
+                <input type="hidden" id="edit-category"> 
+
+                <div id="edit-food-fields" class="hidden flex-col gap-4 bg-white p-4 rounded-xl border border-love-accent/20">
+                    <div>
+                        <label class="block text-sm font-bold text-love-text/80 mb-1 uppercase tracking-widest text-[10px]">Tên Địa Điểm / Tên Quán</label>
+                        <input type="text" id="edit-food-title" class="w-full px-3 py-2 border-b border-love-accent/30 focus:border-love-accent bg-transparent outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-love-text/80 mb-1 uppercase tracking-widest text-[10px]">Loại Kỷ Niệm (Tag)</label>
+                        <input type="text" id="edit-food-tag" class="w-full px-3 py-2 border-b border-love-accent/30 focus:border-love-accent bg-transparent outline-none">
+                    </div>
+                </div>
+
+                <div class="flex-grow">
+                    <label class="block text-sm font-bold text-love-text/80 mb-2 uppercase tracking-widest text-[10px]">Lời Tựa / Nhận Xét</label>
+                    <textarea id="edit-caption" rows="3" class="w-full h-24 px-4 py-3 rounded-xl border border-love-accent/30 focus:border-love-accent bg-white outline-none resize-none shadow-sm"></textarea>
+                </div>
+                
+                <button id="submit-edit" class="w-full bg-love-accent text-white py-3.5 rounded-xl font-bold mt-2 hover:bg-love-text transition-colors shadow-md flex items-center justify-center gap-2">
+                    Lưu Thay Đổi
+                </button>
+                <button id="close-edit" class="text-sm text-love-text/60 underline text-center mt-1 hover:text-love-accent">Hủy thao tác</button>
+            </div>
+        </div>
+    </div>
     
     <!-- Màn che Đang Tải -->
     <div id="loading-screen" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-[200] hidden flex-col items-center justify-center">
@@ -759,8 +822,13 @@
                     if(!item.type || item.type === 'polaroid') {
                         polaroidHTML += `
                         <div class="polaroid opacity-0 relative group" style="transform: rotate(${randomRotate}deg);">
+                            <!-- Thêm Nút Sửa (Màu Vàng Vintage) -->
+                            <button onclick="editItem(${index})" class="absolute top-2 right-12 z-50 bg-white/90 w-8 h-8 rounded-full text-amber-500 opacity-0 group-hover:opacity-100 shadow-md flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all duration-300" title="Chỉnh sửa nội dung">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            </button>
                             <button onclick="deleteItem(${index})" class="absolute top-2 right-2 z-50 bg-white/90 w-8 h-8 rounded-full text-red-500 opacity-0 group-hover:opacity-100 shadow-md flex items-center justify-center hover:bg-red-500 hover:text-white transition-all duration-300" title="Xóa ảnh">✕</button>
-                            <img src="${item.url}" alt="Kỷ niệm" loading="lazy">
+                            <!-- Áp dụng class lock-img chống lưu ảnh -->
+                            <img src="${item.url}" alt="Kỷ niệm" loading="lazy" class="lock-img" oncontextmenu="return false;">
                             <p class="polaroid-caption">${item.caption}</p>
                         </div>`;
                     }
@@ -769,6 +837,10 @@
 
                         foodHTML += `
                         <div class="single-anim opacity-0 flex flex-col items-center group relative cursor-pointer">
+                            <!-- Thêm Nút Sửa -->
+                            <button onclick="editItem(${index})" class="absolute top-0 right-10 z-50 bg-white/90 w-8 h-8 rounded-full text-amber-500 opacity-0 group-hover:opacity-100 shadow-md flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all duration-300" title="Chỉnh sửa nội dung">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            </button>
                             <button onclick="deleteItem(${index})" class="absolute top-0 right-0 z-50 bg-white/90 w-8 h-8 rounded-full text-red-500 opacity-0 group-hover:opacity-100 shadow-md flex items-center justify-center hover:bg-red-500 hover:text-white transition-all duration-300" title="Xóa Đĩa đơn">✕</button>
                             
                             <div class="relative w-56 h-56 md:w-64 md:h-64 mb-8">
@@ -787,7 +859,8 @@
                                     
                                     <div class="absolute inset-0 ml-[14px] p-[2px]">
                                         <div class="relative w-full h-full overflow-hidden rounded-[2px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.1)] bg-[#FDFBF7]">
-                                            <img src="${item.url}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                                            <!-- Áp dụng class lock-img chống lưu ảnh -->
+                                            <img src="${item.url}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 lock-img" oncontextmenu="return false;">
                                             <div class="absolute inset-0 bg-gradient-to-tr from-transparent via- to-transparent pointer-events-none"></div>
                                             <div class="absolute inset-2 md:inset-3 border-[1px] border-black/10 rounded-full pointer-events-none"></div>
                                             <div class="absolute inset-2 md:inset-3 border-[1px] border-white/20 rounded-full pointer-events-none mix-blend-overlay"></div>
@@ -817,7 +890,7 @@
             }
             renderGallery(); // Khởi chạy lần đầu
 
-            // 3. XỬ LÝ FORM GUESTBOOK (EMAILJS)
+            // 3. XỬ LÝ FORM GUESTBOOK
             const form = document.getElementById('guestbook-form');
             const submitBtn = document.getElementById('submit-guestbook');
             const thankYouMsg = document.getElementById('thank-you-msg');
@@ -850,7 +923,7 @@
             let isPlaying = false;
 
             function startMusic() {
-                audio.play().then(() => { isPlaying = true; vinylDiscEl.classList.add('is-spinning'); vinylBtn.classList.add('is-playing'); }).catch(err => { console.log("Chặn auto play:", err); });
+                audio.play().then(() => { isPlaying = true; vinylDiscEl.classList.add('is-spinning'); vinylBtn.classList.add('is-playing'); }).catch(err => {});
             }
             function pauseMusic() {
                 audio.pause(); isPlaying = false; vinylDiscEl.classList.remove('is-spinning'); vinylBtn.classList.remove('is-playing');
@@ -871,8 +944,8 @@
             gsap.to(".map-section", { opacity: 1, y: -20, duration: 1, ease: "power2.out", scrollTrigger: { trigger: ".map-section", start: "top 85%" } });
             gsap.utils.toArray('.guest-anim').forEach((el, index) => { gsap.fromTo(el, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1, delay: index * 0.2, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 85%" } }); });
             
-           // =========================================================================
-            // 5. HỆ THỐNG GIAO DIỆN MODAL UPLOAD VÀ XOÁ (KHÔNG RELOAD TRANG)
+            // =========================================================================
+            // 5. HỆ THỐNG GIAO DIỆN MODAL UPLOAD, SỬA VÀ XOÁ (FULL TÍNH NĂNG)
             // =========================================================================
             const passModal = document.getElementById('pass-modal');
             const passBox = document.getElementById('pass-box');
@@ -880,19 +953,24 @@
             const uploadBox = document.getElementById('upload-box');
             const fileInput = document.getElementById('file-input');
             const imagePreview = document.getElementById('image-preview');
-            
             const confirmDeleteModal = document.getElementById('confirm-delete-modal');
             const confirmDeleteBox = document.getElementById('confirm-delete-box');
             
+            // Các biến State
             let currentFile = null;
             let currentRotation = 0; 
             let passAction = 'upload'; 
             let itemToDeleteIndex = null; 
+            let itemToEditIndex = null;
 
             // Cờ ghi nhớ phiên đăng nhập
             let isUploadAuth = false;
             let isDeleteAuth = false;
+            let isEditAuth = false;
 
+            // --- 5.1 NÚT TÍNH NĂNG ---
+
+            // Dropdown phân loại ở Upload
             document.getElementById('upload-category').addEventListener('change', function() {
                 if(this.value === 'food') {
                     document.getElementById('food-fields').classList.remove('hidden');
@@ -934,9 +1012,46 @@
                 }
             };
 
-            // HÀM THỰC THI XÓA NGẦM TRÊN JSONBIN VÀ CẬP NHẬT GIAO DIỆN
-          async function performDelete() {
-                // Kiểm tra xem nếu chỉ còn đúng 1 tấm thì chặn lại không cho xóa trắng
+            // GỌI NÚT SỬA ẢNH
+            window.editItem = function(index) {
+                itemToEditIndex = index;
+                if (isEditAuth) {
+                    openEditModal();
+                } else {
+                    passAction = 'edit';
+                    document.getElementById('pass-title').innerText = "Chỉnh Sửa Kỷ Niệm";
+                    document.getElementById('pass-desc').innerText = "Nhập mật mã để có quyền thay đổi thông tin";
+                    document.getElementById('verify-pass').innerText = "Xác Thực";
+                    passModal.classList.remove('hidden');
+                    setTimeout(() => { passModal.classList.remove('opacity-0'); passBox.classList.remove('scale-95'); }, 10);
+                }
+            };
+
+            // HÀM MỞ KHUNG SỬA (Lấy dữ liệu cũ đắp lên form)
+            function openEditModal() {
+                const item = dbRecords[itemToEditIndex];
+                document.getElementById('edit-image-preview').src = item.url;
+                document.getElementById('edit-category').value = item.type || 'polaroid';
+                document.getElementById('edit-caption').value = item.caption || '';
+                
+                if(item.type === 'food') {
+                    document.getElementById('edit-food-fields').classList.remove('hidden');
+                    document.getElementById('edit-food-fields').classList.add('flex');
+                    document.getElementById('edit-food-title').value = item.title || '';
+                    document.getElementById('edit-food-tag').value = item.tag || '';
+                } else {
+                    document.getElementById('edit-food-fields').classList.add('hidden');
+                    document.getElementById('edit-food-fields').classList.remove('flex');
+                }
+
+                const editModal = document.getElementById('edit-modal');
+                const editBox = document.getElementById('edit-box');
+                editModal.classList.remove('hidden');
+                setTimeout(() => { editModal.classList.remove('opacity-0'); editBox.classList.remove('scale-95'); }, 10);
+            }
+
+            // HÀM THỰC THI XÓA NGẦM TRÊN JSONBIN
+            async function performDelete() {
                 if (dbRecords.length <= 1) {
                     alert("Phải giữ lại ít nhất 1 kỷ niệm chứ, không được xóa hết đâu nha! 🥺");
                     return;
@@ -949,21 +1064,13 @@
                 updatedRecords.splice(itemToDeleteIndex, 1);
                 
                 try {
-                    const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_ID}`, {
-                        method: "PUT", 
-                        headers: { 
-                            "Content-Type": "application/json", 
-                            "X-Master-Key": JSONBIN_KEY 
-                        },
+                    await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_ID}`, {
+                        method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_KEY },
                         body: JSON.stringify(updatedRecords)
                     });
-                    
-                    if (!response.ok) throw new Error("API từ chối cập nhật");
-
                     dbRecords = updatedRecords;
                     renderGallery();
                 } catch(err) {
-                    console.log(err);
                     alert("Xoá thất bại! Vui lòng thử lại.");
                 } finally {
                     document.getElementById('loading-screen').classList.add('hidden');
@@ -971,10 +1078,17 @@
                 }
             }
 
-            // HÀM ĐÓNG CÁC MODAL
+            // --- 5.2 HÀM ĐÓNG MỞ CÁC MODAL ---
             document.getElementById('close-pass').addEventListener('click', () => {
                 passModal.classList.add('opacity-0'); passBox.classList.add('scale-95');
                 setTimeout(() => passModal.classList.add('hidden'), 300);
+            });
+
+            document.getElementById('close-error').addEventListener('click', () => {
+                const errModal = document.getElementById('error-modal');
+                const errBox = document.getElementById('error-box');
+                errModal.classList.add('opacity-0'); errBox.classList.add('scale-95');
+                setTimeout(() => errModal.classList.add('hidden'), 300);
             });
 
             document.getElementById('cancel-delete').addEventListener('click', () => {
@@ -988,7 +1102,14 @@
                 performDelete();
             });
 
-            // XÁC NHẬN PASS
+            document.getElementById('close-edit').addEventListener('click', () => {
+                const editModal = document.getElementById('edit-modal');
+                const editBox = document.getElementById('edit-box');
+                editModal.classList.add('opacity-0'); editBox.classList.add('scale-95');
+                setTimeout(() => editModal.classList.add('hidden'), 300);
+            });
+
+            // --- 5.3 XÁC NHẬN PASS VÀ GỌI LỖI TONE HỒNG ---
             document.getElementById('verify-pass').addEventListener('click', async () => {
                 const pass = document.getElementById('secret-pass').value;
                 if (pass === SECRET_PASS) {
@@ -1006,13 +1127,58 @@
                         confirmDeleteModal.classList.remove('hidden');
                         setTimeout(() => { confirmDeleteModal.classList.remove('opacity-0'); confirmDeleteBox.classList.remove('scale-95'); }, 10);
                     }
+                    else if (passAction === 'edit') {
+                        isEditAuth = true;
+                        openEditModal();
+                    }
                 } else {
-                    alert("Sai mật mã rồi bạn ơi!");
+                    // Xử lý báo lỗi Tone hồng
                     document.getElementById('secret-pass').value = '';
+                    passModal.classList.add('opacity-0'); passBox.classList.add('scale-95');
+                    
+                    setTimeout(() => {
+                        passModal.classList.add('hidden');
+                        // Bật modal lỗi lên thay vì dùng alert
+                        const errModal = document.getElementById('error-modal');
+                        const errBox = document.getElementById('error-box');
+                        errModal.classList.remove('hidden');
+                        setTimeout(() => { errModal.classList.remove('opacity-0'); errBox.classList.remove('scale-95'); }, 10);
+                    }, 300);
                 }
             });
 
-            // ĐÓNG KHUNG UPLOAD
+            // --- 5.4 XỬ LÝ LƯU CHỈNH SỬA ---
+            document.getElementById('submit-edit').addEventListener('click', async () => {
+                document.getElementById('loading-screen').classList.remove('hidden');
+                document.getElementById('loading-screen').classList.add('flex');
+
+                try {
+                    // Cập nhật dữ liệu vào biến nội bộ
+                    dbRecords[itemToEditIndex].caption = document.getElementById('edit-caption').value;
+                    if(dbRecords[itemToEditIndex].type === 'food') {
+                        dbRecords[itemToEditIndex].title = document.getElementById('edit-food-title').value;
+                        dbRecords[itemToEditIndex].tag = document.getElementById('edit-food-tag').value;
+                    }
+
+                    // Đẩy mảng mới lên JSONBin
+                    await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_ID}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_KEY },
+                        body: JSON.stringify(dbRecords)
+                    });
+
+                    // Đóng modal và vẽ lại giao diện
+                    document.getElementById('close-edit').click();
+                    renderGallery();
+                } catch (error) {
+                    alert("Có lỗi xảy ra khi lưu :(");
+                } finally {
+                    document.getElementById('loading-screen').classList.add('hidden');
+                    document.getElementById('loading-screen').classList.remove('flex');
+                }
+            });
+
+            // --- 5.5 XỬ LÝ UPLOAD ẢNH (Giữ nguyên) ---
             document.getElementById('close-upload').addEventListener('click', () => {
                 uploadModal.classList.add('opacity-0'); uploadBox.classList.add('scale-95');
                 setTimeout(() => uploadModal.classList.add('hidden'), 300);
@@ -1062,7 +1228,6 @@
                 });
             }
 
-            // GỬI DỮ LIỆU UPLOAD NGẦM VÀ CẬP NHẬT GIAO DIỆN
             document.getElementById('submit-upload').addEventListener('click', async () => {
                 if (!currentFile) return alert("Bạn chưa chọn ảnh nào kìa!");
                 
@@ -1099,13 +1264,11 @@
                         body: JSON.stringify(dbRecords)
                     });
 
-                    // Đóng modal up ảnh và reset form
                     document.getElementById('close-upload').click();
                     document.getElementById('upload-caption').value = '';
                     document.getElementById('food-title').value = '';
                     document.getElementById('food-tag').value = '';
 
-                    // Cập nhật lại giao diện mượt mà ngay lập tức
                     renderGallery();
                 } catch (error) {
                     alert("Có lỗi xảy ra khi up ảnh :(");
@@ -1114,6 +1277,8 @@
                     document.getElementById('loading-screen').classList.remove('flex');
                 }
             });
+        });
+    </script>
         });
     </script>
 </body>
