@@ -1116,41 +1116,102 @@
                 editModal.classList.add('opacity-0'); editBox.classList.add('scale-95');
                 setTimeout(() => editModal.classList.add('hidden'), 300);
             });
+           // --- KHÓA CHỐNG SPAM CLICK/ENTER (BẢN FIX TRIỆT ĐỂ) ---
+            let isModalTransitioning = false; 
+
+            // NÚT THỬ LẠI (TẮT BẢNG LỖI VÀ MỞ LẠI BẢNG PASS LUÔN)
+            document.getElementById('close-error').addEventListener('click', () => {
+                if (isModalTransitioning) return; 
+                isModalTransitioning = true; 
+
+                const errModal = document.getElementById('error-modal');
+                const errBox = document.getElementById('error-box');
+                
+                errModal.classList.add('opacity-0'); 
+                errBox.classList.add('scale-95');
+                
+                setTimeout(() => { 
+                    errModal.classList.add('hidden'); 
+                    
+                    passModal.classList.remove('hidden');
+                    setTimeout(() => { 
+                        passModal.classList.remove('opacity-0'); 
+                        passBox.classList.remove('scale-95'); 
+                        document.getElementById('secret-pass').focus();
+                        isModalTransitioning = false; 
+                    }, 10);
+                }, 300);
+            });
+
+            // SỬ DỤNG 'keyup' ĐỂ CHỐNG LỖI ĐÈ PHÍM (HOLD KEY)
+            document.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    const errModal = document.getElementById('error-modal');
+                    if (!errModal.classList.contains('hidden') && !isModalTransitioning) {
+                        e.preventDefault();
+                        document.getElementById('close-error').click();
+                    }
+                }
+            });
 
             // --- 5.3 XÁC NHẬN PASS VÀ GỌI LỖI TONE HỒNG ---
+            
+            // SỬ DỤNG 'keyup' CHO Ô MẬT KHẨU
+            document.getElementById('secret-pass').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!isModalTransitioning) {
+                        document.getElementById('verify-pass').click();
+                    }
+                }
+            });
+
+            // Xử lý khi bấm nút Xác nhận (hoặc Enter)
             document.getElementById('verify-pass').addEventListener('click', async () => {
-                const pass = document.getElementById('secret-pass').value;
+                // CHỐT CHẶN: Nếu chưa nhập chữ nào mà đã bấm Enter thì không làm gì cả
+                const pass = document.getElementById('secret-pass').value.trim();
+                if (!pass) return; 
+
+                if (isModalTransitioning) return; 
+                isModalTransitioning = true; 
+
                 if (pass === SECRET_PASS) {
                     passModal.classList.add('opacity-0'); passBox.classList.add('scale-95');
-                    setTimeout(() => passModal.classList.add('hidden'), 300);
-                    document.getElementById('secret-pass').value = '';
-                    
-                    if (passAction === 'upload') {
-                        isUploadAuth = true; 
-                        uploadModal.classList.remove('hidden');
-                        setTimeout(() => { uploadModal.classList.remove('opacity-0'); uploadBox.classList.remove('scale-95'); }, 10);
-                    } 
-                    else if (passAction === 'delete') {
-                        isDeleteAuth = true; 
-                        confirmDeleteModal.classList.remove('hidden');
-                        setTimeout(() => { confirmDeleteModal.classList.remove('opacity-0'); confirmDeleteBox.classList.remove('scale-95'); }, 10);
-                    }
-                    else if (passAction === 'edit') {
-                        isEditAuth = true;
-                        openEditModal();
-                    }
+                    setTimeout(() => {
+                        passModal.classList.add('hidden');
+                        document.getElementById('secret-pass').value = '';
+                        
+                        if (passAction === 'upload') {
+                            isUploadAuth = true; 
+                            uploadModal.classList.remove('hidden');
+                            setTimeout(() => { uploadModal.classList.remove('opacity-0'); uploadBox.classList.remove('scale-95'); isModalTransitioning = false; }, 10);
+                        } 
+                        else if (passAction === 'delete') {
+                            isDeleteAuth = true; 
+                            confirmDeleteModal.classList.remove('hidden');
+                            setTimeout(() => { confirmDeleteModal.classList.remove('opacity-0'); confirmDeleteBox.classList.remove('scale-95'); isModalTransitioning = false; }, 10);
+                        }
+                        else if (passAction === 'edit') {
+                            isEditAuth = true;
+                            openEditModal();
+                            isModalTransitioning = false;
+                        }
+                    }, 300);
                 } else {
-                    // Xử lý báo lỗi Tone hồng
+                    // Nhập sai pass
                     document.getElementById('secret-pass').value = '';
                     passModal.classList.add('opacity-0'); passBox.classList.add('scale-95');
                     
                     setTimeout(() => {
                         passModal.classList.add('hidden');
-                        // Bật modal lỗi lên thay vì dùng alert
                         const errModal = document.getElementById('error-modal');
                         const errBox = document.getElementById('error-box');
                         errModal.classList.remove('hidden');
-                        setTimeout(() => { errModal.classList.remove('opacity-0'); errBox.classList.remove('scale-95'); }, 10);
+                        setTimeout(() => { 
+                            errModal.classList.remove('opacity-0'); 
+                            errBox.classList.remove('scale-95'); 
+                            isModalTransitioning = false; 
+                        }, 10);
                     }, 300);
                 }
             });
